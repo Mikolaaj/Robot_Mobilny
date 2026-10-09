@@ -1,2 +1,1 @@
-# Manipulator
-Manipulator
+# Robot Mobilny

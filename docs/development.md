@@ -15,7 +15,7 @@ git switch -c codex/phase4-description
 
 Nazwa powyżej to przykład fazy 4; dobieraj ją do aktualnego zadania.
 Nie przenoś niedokończonej fazy na main. Poprawki tej samej fazy kontynuuj
-na jej istniejącej gałęzi, obecnie codex/ci-setup.
+na jej istniejącej gałęzi, obecnie ci-cd-setup.
 
 3. Zmieniaj kod i zgodną z nim dokumentację. Wyjaśnij pliki, przepływ danych,
    budowanie, uruchomienie, wynik, testy, diagnostykę i pojęcia.

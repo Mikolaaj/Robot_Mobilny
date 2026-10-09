@@ -2,7 +2,7 @@
 
 ## Stan i zakres
 
-Konfiguracja CI została wysłana na gałąź codex/ci-setup (commit 0afd43d).
+Konfiguracja CI została wysłana na gałąź ci-cd-setup (commit 0afd43d).
 Lokalnie zaliczono formatowanie, analizę Ruff, test C++ kinematyki,
 6 testów Pythona i integracyjny test ROS. Wynik uruchomienia na GitHubie
 musi zostać sprawdzony w Actions; nie potwierdzamy go na podstawie pushu.

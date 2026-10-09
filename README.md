@@ -43,14 +43,15 @@ Jeżeli wystąpi błąd, zachowaj komunikaty z terminala do diagnostyki.
 Użytkownik potwierdził uruchomienie pustego świata w GUI Gazebo.
 
 `.venv`, cache oraz katalogi build/install/log są ignorowane przez Git.
-Na tym etapie nie dodajemy zależności pip: przyszłe zależności projektowe
-zapiszemy w repozytorium, gdy dany etap będzie ich potrzebować.
+Zależności developerskie Pythona zapisujemy w requirements-dev.txt.
+Po aktywacji środowiska instaluj je przez python -m pip install -r requirements-dev.txt.
 Docker jest opcjonalny; jego daemon nie był uruchomiony podczas diagnostyki.
 Pakiet edukacyjny ROS znajduje się w ros2_ws/src/amr_learning. Model robota i sterownik powstaną w kolejnych fazach.
 
 ## Aktualny stan i konstrukcja
 
-Fazy 0–2 ukończone. Następna jest osobna faza 3: CI/CD na GitHubie.
+Fazy 0–2 ukończone. Faza 3 w toku: workflow CI wysłany na GitHub;
+wynik Actions wymaga potwierdzenia. Docker i publikowanie obrazu CD pozostają do wykonania.
 Przykład kinematyki został dostosowany do Ackermanna 4WD.
 Komendy określają prędkość środka tylnej osi i prędkość obrotu robota.
 Robot nie obraca się w miejscu; każde koło dostaje własne RPM.
@@ -63,3 +64,14 @@ Przykłady C++/Python i dokładne instrukcje: [docs/phase1.md](docs/phase1.md).
 ## Faza 2
 
 Pakiet amr_learning: [instrukcja ROS 2](docs/phase2.md).
+
+## Faza 3
+
+GitHub Actions, formatowanie i automatyczne testy:
+[instrukcja i stan CI/CD](docs/phase3.md).
+
+## Sposób pracy
+
+Kolejne fazy: osobna gałąź → lokalne testy → commit/push → pull request
+→ zielone CI i przegląd zmian → scalenie do main.
+[Szczegółowe zasady](docs/development.md).

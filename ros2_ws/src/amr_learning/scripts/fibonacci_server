@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """Bounded educational action with feedback, cancellation and one active goal."""
+
 import time
 from threading import Lock
 import rclpy
@@ -12,13 +13,18 @@ from rclpy.node import Node
 
 class FibonacciServer(Node):
     def __init__(self) -> None:
-        super().__init__('fibonacci_server')
+        super().__init__("fibonacci_server")
         self.lock = Lock()
         self.busy = False
         self.server = ActionServer(
-            self, Fibonacci, 'phase2/fibonacci', execute_callback=self.execute,
-            goal_callback=self.accept, cancel_callback=self.cancel,
-            callback_group=ReentrantCallbackGroup())
+            self,
+            Fibonacci,
+            "phase2/fibonacci",
+            execute_callback=self.execute,
+            goal_callback=self.accept,
+            cancel_callback=self.cancel,
+            callback_group=ReentrantCallbackGroup(),
+        )
 
     def accept(self, request: Fibonacci.Goal) -> GoalResponse:
         with self.lock:
@@ -67,5 +73,5 @@ def main() -> None:
             rclpy.shutdown()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -21,7 +21,9 @@ Robot nie wykonuje obrotów w miejscu; teleoperacja i Nav2 muszą to respektowa�
 1. Gotowe: samodzielne obliczenia Ackermanna C++/Python i testy jednostkowe.
 2. Gotowe: edukacyjny amr_learning — tematy, parametr, usługa, akcja,
    test integracyjny. Nie jest jeszcze sterownikiem robota.
-3. Następne: osobna faza CI/CD, GitHub Actions i Docker.
+3. W toku: workflow GitHub Actions i lokalne sprawdzenia gotowe; wynik CI
+   na GitHubie wymaga potwierdzenia. Docker/CD pozostają do zrobienia.
+   Szczegóły: [phase3.md](phase3.md); zasady gałęzi: [development.md](development.md).
 
 ## Dalsze fazy i technologie
 

@@ -18,3 +18,5 @@ log/
 # Editor and OS files
 .idea/
 .DS_Store
+# Local VS Code settings
+.vscode/

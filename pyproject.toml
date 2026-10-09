@@ -1,0 +1,12 @@
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+include = [
+    "*.py",
+    "pyproject.toml",
+    "ros2_ws/src/amr_learning/scripts/python_peer",
+    "ros2_ws/src/amr_learning/scripts/fibonacci_server",
+]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]

@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up ROS 2 Jazzy
+        uses: ros-tooling/setup-ros@v0.7
+        with:
+          required-ros-distributions: jazzy
+
+      - name: Install development dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential cmake ninja-build clang-format-18 \
+            python3-venv python3-colcon-common-extensions \
+            ros-jazzy-action-tutorials-interfaces \
+            ros-jazzy-std-msgs ros-jazzy-std-srvs
+
+          /usr/bin/python3 -m venv --system-site-packages .venv
+          .venv/bin/python -m pip install -r requirements-dev.txt
+
+      - name: Check Python
+        run: |
+          .venv/bin/ruff check examples/phase1 ros2_ws/src/amr_learning
+          .venv/bin/ruff format --check examples/phase1 ros2_ws/src/amr_learning
+
+      - name: Check C++ formatting
+        run: |
+          clang-format-18 --dry-run --Werror \
+            examples/phase1/kinematics.hpp \
+            examples/phase1/main.cpp \
+            examples/phase1/test_kinematics.cpp \
+            ros2_ws/src/amr_learning/src/cpp_peer.cpp
+
+      - name: Build and test kinematics
+        run: |
+          cmake -S examples/phase1 -B build/phase1 -G Ninja
+          cmake --build build/phase1
+          ctest --test-dir build/phase1 --output-on-failure
+          .venv/bin/python -m unittest discover -s examples/phase1 -v
+
+      - name: Build ROS package
+        run: |
+          source /opt/ros/jazzy/setup.bash
+          cd ros2_ws
+          /usr/bin/python3 -m colcon build \
+            --packages-select amr_learning \
+            --cmake-args -DPython3_EXECUTABLE=/usr/bin/python3
+
+      - name: Test ROS communication
+        run: |
+          source /opt/ros/jazzy/setup.bash
+          source ros2_ws/install/setup.bash
+          cd ros2_ws
+          /usr/bin/python3 -m colcon test \
+            --packages-select amr_learning \
+            --event-handlers console_direct+
+          /usr/bin/python3 -m colcon test-result --verbose

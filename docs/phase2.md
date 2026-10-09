@@ -3,6 +3,8 @@
 ## Cel i architektura
 
 Tworzymy edukacyjny pakiet amr_learning. Nie steruje jeszcze robotem.
+Docelowy robot to Ackermann 4WD (cztery koła napędowe, dwa przednie skrętne);
+przykłady komunikacji są niezależne od rodzaju podwozia.
 Python publikuje wiadomość co sekundę, C++ odbiera ją i publikuje odpowiedź,
 a Python odbiera odpowiedź. Oddzielne tematy zapobiegają pętli odpowiedzi.
 

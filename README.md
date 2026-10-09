@@ -1,6 +1,6 @@
 # Robot Mobilny — AMR Robotics Lab
 
-Projekt edukacyjny robota mobilnego z napędem różnicowym.
+Projekt edukacyjny robota mobilnego 4WD: cztery koła napędowe, dwa przednie skrętne (Ackermann).
 Rozwijamy go etapami: podstawy, ROS 2, model robota, Gazebo, SLAM i nawigacja,
 a następnie CAN, MQTT, gRPC i percepcja.
 
@@ -46,12 +46,15 @@ Użytkownik potwierdził uruchomienie pustego świata w GUI Gazebo.
 Na tym etapie nie dodajemy zależności pip: przyszłe zależności projektowe
 zapiszemy w repozytorium, gdy dany etap będzie ich potrzebować.
 Docker jest opcjonalny; jego daemon nie był uruchomiony podczas diagnostyki.
-Nie ma jeszcze własnych pakietów ROS ani kodu robota do budowania.
+Pakiet edukacyjny ROS znajduje się w ros2_ws/src/amr_learning. Model robota i sterownik powstaną w kolejnych fazach.
 
-## Następny etap
+## Aktualny stan i konstrukcja
 
-Faza 1: mały przykład kinematyki napędu różnicowego w C++ i Pythonie,
-z CMake, testami i wyjaśnieniem zależności prędkości robota od prędkości kół.
+Fazy 0–2 ukończone. Następna jest osobna faza 3: CI/CD na GitHubie.
+Przykład kinematyki został dostosowany do Ackermanna 4WD.
+Komendy określają prędkość środka tylnej osi i prędkość obrotu robota.
+Robot nie obraca się w miejscu; każde koło dostaje własne RPM.
+Założenia oraz plan wszystkich faz: [docs/architecture.md](docs/architecture.md).
 
 ## Faza 1
 

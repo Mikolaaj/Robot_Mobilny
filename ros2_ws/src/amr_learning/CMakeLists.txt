@@ -1,0 +1,23 @@
+cmake_minimum_required(VERSION 3.16)
+project(amr_learning)
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(std_srvs REQUIRED)
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+add_executable(cpp_peer src/cpp_peer.cpp)
+target_compile_features(cpp_peer PRIVATE cxx_std_17)
+target_compile_options(cpp_peer PRIVATE -Wall -Wextra -Wpedantic)
+ament_target_dependencies(cpp_peer rclcpp std_msgs std_srvs)
+install(TARGETS cpp_peer DESTINATION lib/${PROJECT_NAME})
+install(PROGRAMS scripts/python_peer scripts/fibonacci_server DESTINATION lib/${PROJECT_NAME})
+install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
+if(BUILD_TESTING)
+  enable_testing()
+  add_test(NAME communication_integration COMMAND ${Python3_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/integration.py
+    $<TARGET_FILE:cpp_peer> ${CMAKE_CURRENT_SOURCE_DIR}/scripts/python_peer
+    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/fibonacci_server)
+  set_tests_properties(communication_integration PROPERTIES TIMEOUT 45)
+endif()
+ament_package()

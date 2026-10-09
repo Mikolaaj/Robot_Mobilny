@@ -1,0 +1,46 @@
+#!/usr/bin/python3
+"""Periodic Python publisher and C++ reply subscriber."""
+import rclpy
+from rclpy.node import Node
+from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
+from std_msgs.msg import String
+
+
+class PythonPeer(Node):
+    def __init__(self) -> None:
+        super().__init__('python_peer')
+        self.declare_parameter('message_prefix', 'hello')
+        qos = QoSProfile(depth=10, reliability=ReliabilityPolicy.RELIABLE,
+                         durability=DurabilityPolicy.VOLATILE)
+        self.publisher = self.create_publisher(String, 'phase2/python_message', qos)
+        self.subscription = self.create_subscription(
+            String, 'phase2/cpp_message', self.receive, qos)
+        self.counter = 0
+        self.timer = self.create_timer(1.0, self.publish_message)
+
+    def publish_message(self) -> None:
+        self.counter += 1
+        prefix = self.get_parameter('message_prefix').value
+        message = String(data=f'{prefix} #{self.counter}')
+        self.publisher.publish(message)
+        self.get_logger().info(f'Sent: {message.data}')
+
+    def receive(self, message: String) -> None:
+        self.get_logger().info(f'Received: {message.data}')
+
+
+def main() -> None:
+    rclpy.init()
+    node = PythonPeer()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()

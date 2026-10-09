@@ -56,3 +56,7 @@ z CMake, testami i wyjaśnieniem zależności prędkości robota od prędkości 
 ## Faza 1
 
 Przykłady C++/Python i dokładne instrukcje: [docs/phase1.md](docs/phase1.md).
+
+## Faza 2
+
+Pakiet amr_learning: [instrukcja ROS 2](docs/phase2.md).

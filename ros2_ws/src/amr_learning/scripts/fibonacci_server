@@ -1,0 +1,71 @@
+#!/usr/bin/python3
+"""Bounded educational action with feedback, cancellation and one active goal."""
+import time
+from threading import Lock
+import rclpy
+from action_tutorials_interfaces.action import Fibonacci
+from rclpy.action import ActionServer, CancelResponse, GoalResponse
+from rclpy.callback_groups import ReentrantCallbackGroup
+from rclpy.executors import MultiThreadedExecutor
+from rclpy.node import Node
+
+
+class FibonacciServer(Node):
+    def __init__(self) -> None:
+        super().__init__('fibonacci_server')
+        self.lock = Lock()
+        self.busy = False
+        self.server = ActionServer(
+            self, Fibonacci, 'phase2/fibonacci', execute_callback=self.execute,
+            goal_callback=self.accept, cancel_callback=self.cancel,
+            callback_group=ReentrantCallbackGroup())
+
+    def accept(self, request: Fibonacci.Goal) -> GoalResponse:
+        with self.lock:
+            if self.busy or not 2 <= request.order <= 20:
+                return GoalResponse.REJECT
+            self.busy = True
+        return GoalResponse.ACCEPT
+
+    def cancel(self, goal_handle) -> CancelResponse:
+        return CancelResponse.ACCEPT
+
+    def execute(self, goal_handle) -> Fibonacci.Result:
+        sequence = [0, 1]
+        try:
+            for _ in range(goal_handle.request.order - 2):
+                if goal_handle.is_cancel_requested:
+                    goal_handle.canceled()
+                    return Fibonacci.Result(sequence=sequence)
+                sequence.append(sequence[-1] + sequence[-2])
+                goal_handle.publish_feedback(Fibonacci.Feedback(partial_sequence=sequence))
+                time.sleep(0.2)
+            if goal_handle.is_cancel_requested:
+                goal_handle.canceled()
+            else:
+                goal_handle.succeed()
+            return Fibonacci.Result(sequence=sequence)
+        finally:
+            with self.lock:
+                self.busy = False
+
+
+def main() -> None:
+    rclpy.init()
+    node = FibonacciServer()
+    executor = MultiThreadedExecutor(num_threads=2)
+    executor.add_node(node)
+    try:
+        executor.spin()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        executor.shutdown()
+        node.server.destroy()
+        node.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()

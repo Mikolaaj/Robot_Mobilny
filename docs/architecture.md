@@ -27,7 +27,9 @@ Robot nie wykonuje obrotów w miejscu; teleoperacja i Nav2 muszą to respektowa�
 
 ## Dalsze fazy i technologie
 
-4. URDF/Xacro, RViz, TF: cztery koła napędowe i dwa przednie przeguby skrętu.
+4. W toku: URDF/Xacro, RViz i TF modelu działają; cztery koła i dwa przednie
+   przeguby skrętu. Pozostają zapis widoku, testy i rozszerzenie CI.
+   Instrukcja: [phase4.md](phase4.md).
 5. Gazebo magazyn, ros_gz/ROS ↔ Gazebo Transport, teleoperacja Ackermanna.
    Sterownik musi obsługiwać cztery RPM i dwa kąty; nie zakładamy, że gotowy
    ackermann_steering_controller obsłuży napęd 4WD bez rozszerzenia.

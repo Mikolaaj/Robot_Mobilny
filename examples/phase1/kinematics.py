@@ -24,12 +24,12 @@ def wheel_commands(
 ) -> WheelCommands:
     """Ideal rolling commands. Reject infeasible turns rather than clip them."""
     if not all(isfinite(x) for x in (v, yaw_rate, radius, track, wheelbase, max_steering)):
-        raise ValueError("Inputs must be finite")
+        raise ValueError('Inputs must be finite')
     if min(radius, track, wheelbase) <= 0 or not 0 < max_steering < pi / 2:
-        raise ValueError("Positive geometry and steering limit in (0, pi/2) required")
+        raise ValueError('Positive geometry and steering limit in (0, pi/2) required')
     if v == 0:
         if yaw_rate != 0:
-            raise ValueError("Ackermann robot cannot rotate in place")
+            raise ValueError('Ackermann robot cannot rotate in place')
         return WheelCommands(0, 0, 0, 0, 0, 0)
     curvature = yaw_rate / v
     left = 1 - curvature * track / 2
@@ -37,7 +37,7 @@ def wheel_commands(
     lateral = curvature * wheelbase
     angles = (atan2(lateral, left), atan2(lateral, right))
     if min(left, right) <= 0 or max(abs(a) for a in angles) > max_steering:
-        raise ValueError("Requested turn exceeds steering geometry/limit")
+        raise ValueError('Requested turn exceeds steering geometry/limit')
     rpm = 60 / (2 * pi * radius)
     return WheelCommands(
         v * hypot(left, lateral) * rpm,
@@ -48,10 +48,10 @@ def wheel_commands(
     )
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     c = wheel_commands(v=0.5, yaw_rate=0.3, radius=0.1, track=0.4, wheelbase=0.6)
-    print(f"front_left={c.front_left_rpm:.3f} RPM, front_right={c.front_right_rpm:.3f} RPM")
-    print(f"rear_left={c.rear_left_rpm:.3f} RPM, rear_right={c.rear_right_rpm:.3f} RPM")
+    print(f'front_left={c.front_left_rpm:.3f} RPM, front_right={c.front_right_rpm:.3f} RPM')
+    print(f'rear_left={c.rear_left_rpm:.3f} RPM, rear_right={c.rear_right_rpm:.3f} RPM')
     print(
-        f"steering_left={c.front_left_steering_rad:.3f} rad, steering_right={c.front_right_steering_rad:.3f} rad"
+        f'steering_left={c.front_left_steering_rad:.3f} rad, steering_right={c.front_right_steering_rad:.3f} rad'
     )

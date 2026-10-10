@@ -13,13 +13,13 @@ from rclpy.node import Node
 
 class FibonacciServer(Node):
     def __init__(self) -> None:
-        super().__init__("fibonacci_server")
+        super().__init__('fibonacci_server')
         self.lock = Lock()
         self.busy = False
         self.server = ActionServer(
             self,
             Fibonacci,
-            "phase2/fibonacci",
+            'phase2/fibonacci',
             execute_callback=self.execute,
             goal_callback=self.accept,
             cancel_callback=self.cancel,
@@ -73,5 +73,5 @@ def main() -> None:
             rclpy.shutdown()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

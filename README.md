@@ -75,3 +75,9 @@ GitHub Actions, formatowanie i automatyczne testy:
 Kolejne fazy: osobna gałąź → lokalne testy → commit/push → pull request
 → zielone CI i przegląd zmian → scalenie do main.
 [Szczegółowe zasady](docs/development.md).
+
+## Faza 4 — model robota
+
+Model 4WD z przednimi kołami skrętnymi działa w RViz.
+[Budowanie, uruchamianie, ustawienia RViz i diagnostyka](docs/phase4.md).
+Zapis konfiguracji widoku oraz rozszerzenie CI pozostają do dokończenia.

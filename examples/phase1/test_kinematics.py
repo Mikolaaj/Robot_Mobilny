@@ -36,7 +36,7 @@ class KinematicsTests(unittest.TestCase):
         forward = wheel_commands(1, 0.3, 0.1, 0.4, 0.6)
         reverse = wheel_commands(-1, -0.3, 0.1, 0.4, 0.6)
         for name, value in vars(forward).items():
-            expected = value if "steering" in name else -value
+            expected = value if 'steering' in name else -value
             self.assertAlmostEqual(getattr(reverse, name), expected)
 
     def test_invalid_or_infeasible(self):

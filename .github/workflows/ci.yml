@@ -33,15 +33,19 @@ jobs:
             build-essential cmake ninja-build clang-format-18 \
             python3-venv python3-colcon-common-extensions \
             ros-jazzy-action-tutorials-interfaces \
-            ros-jazzy-std-msgs ros-jazzy-std-srvs
+            ros-jazzy-std-msgs ros-jazzy-std-srvs \
+            ros-jazzy-xacro ros-jazzy-robot-state-publisher \
+            ros-jazzy-joint-state-publisher-gui ros-jazzy-rviz2 \
+            ros-jazzy-ament-lint-auto ros-jazzy-ament-lint-common \
+            liburdfdom-tools
 
           /usr/bin/python3 -m venv --system-site-packages .venv
           .venv/bin/python -m pip install -r requirements-dev.txt
 
       - name: Check Python
         run: |
-          .venv/bin/ruff check examples/phase1 ros2_ws/src/amr_learning
-          .venv/bin/ruff format --check examples/phase1 ros2_ws/src/amr_learning
+          .venv/bin/ruff check examples/phase1 ros2_ws/src
+          .venv/bin/ruff format --check examples/phase1 ros2_ws/src
 
       - name: Check C++ formatting
         run: |
@@ -58,20 +62,27 @@ jobs:
           ctest --test-dir build/phase1 --output-on-failure
           .venv/bin/python -m unittest discover -s examples/phase1 -v
 
-      - name: Build ROS package
+      - name: Build ROS packages
         run: |
           source /opt/ros/jazzy/setup.bash
           cd ros2_ws
           /usr/bin/python3 -m colcon build \
-            --packages-select amr_learning \
+            --packages-select amr_learning amr_description \
             --cmake-args -DPython3_EXECUTABLE=/usr/bin/python3
 
-      - name: Test ROS communication
+      - name: Test ROS packages
         run: |
           source /opt/ros/jazzy/setup.bash
           source ros2_ws/install/setup.bash
           cd ros2_ws
           /usr/bin/python3 -m colcon test \
-            --packages-select amr_learning \
+            --packages-select amr_learning amr_description \
             --event-handlers console_direct+
           /usr/bin/python3 -m colcon test-result --verbose
+
+      - name: Validate robot description
+        run: |
+          source /opt/ros/jazzy/setup.bash
+          xacro ros2_ws/src/amr_description/urdf/robot.urdf.xacro \
+            -o /tmp/amr_robot.urdf
+          check_urdf /tmp/amr_robot.urdf

@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+<robot name="amr_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- 1. Wymiary podwozia -->
+  <xacro:property name="chassis_length" value="0.80"/>
+  <xacro:property name="chassis_width" value="0.30"/>
+  <xacro:property name="chassis_height" value="0.12"/>
+
+  <!-- 2. Wymiary kół -->
+  <xacro:property name="wheel_radius" value="0.10"/>
+  <xacro:property name="wheel_width" value="0.05"/>
+  <xacro:property name="wheel_track" value="0.40"/>
+  <xacro:property name="wheelbase" value="0.60"/>
+  <xacro:property name="steering_limit" value="0.60"/>
+
+  <!-- 3. Kolory -->
+  <material name="chassis_blue">
+    <color rgba="0.1 0.3 0.8 1.0"/>
+  </material>
+
+  <material name="wheel_black">
+    <color rgba="0.08 0.08 0.08 1.0"/>
+  </material>
+
+  <!-- 4. Układ odniesienia w środku tylnej osi -->
+  <link name="base_link"/>
+
+  <!-- 5. Podwozie -->
+  <link name="chassis_link">
+    <visual>
+      <geometry>
+        <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
+      </geometry>
+      <material name="chassis_blue"/>
+    </visual>
+
+    <collision>
+      <geometry>
+        <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- 6. Sztywne połączenie podwozia z base_link -->
+  <joint name="base_to_chassis" type="fixed">
+    <parent link="base_link"/>
+    <child link="chassis_link"/>
+    <origin xyz="0.30 0 0.12" rpy="0 0 0"/>
+  </joint>
+
+  <!-- 7. Definicja tylnego koła i jego przegubu -->
+  <xacro:macro name="rear_wheel" params="side y">
+
+    <link name="rear_${side}_wheel_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="${pi / 2} 0 0"/>
+        <geometry>
+          <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+        </geometry>
+        <material name="wheel_black"/>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="${pi / 2} 0 0"/>
+        <geometry>
+          <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="rear_${side}_wheel_joint" type="continuous">
+      <parent link="base_link"/>
+      <child link="rear_${side}_wheel_link"/>
+      <origin xyz="0 ${y} 0" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+    </joint>
+
+  </xacro:macro>
+
+  <!-- 8. Utworzenie lewego i prawego tylnego koła -->
+  <xacro:rear_wheel side="left" y="${wheel_track / 2}"/>
+  <xacro:rear_wheel side="right" y="${-wheel_track / 2}"/>
+
+  <!-- Przednie koło: skręt zwrotnicy i obrót koła -->
+  <xacro:macro name="front_wheel" params="side y">
+
+    <link name="front_${side}_steering_link"/>
+
+    <joint name="front_${side}_steering_joint" type="revolute">
+      <parent link="base_link"/>
+      <child link="front_${side}_steering_link"/>
+      <origin xyz="${wheelbase} ${y} 0" rpy="0 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="${-steering_limit}"
+             upper="${steering_limit}"
+             effort="10.0"
+             velocity="1.0"/>
+    </joint>
+
+    <link name="front_${side}_wheel_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="${pi / 2} 0 0"/>
+        <geometry>
+          <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+        </geometry>
+        <material name="wheel_black"/>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="${pi / 2} 0 0"/>
+        <geometry>
+          <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="front_${side}_wheel_joint" type="continuous">
+      <parent link="front_${side}_steering_link"/>
+      <child link="front_${side}_wheel_link"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+    </joint>
+
+  </xacro:macro>
+
+  <xacro:front_wheel side="left" y="${wheel_track / 2}"/>
+  <xacro:front_wheel side="right" y="${-wheel_track / 2}"/>
+
+</robot>

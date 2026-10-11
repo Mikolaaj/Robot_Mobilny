@@ -35,6 +35,7 @@ jobs:
             ros-jazzy-action-tutorials-interfaces \
             ros-jazzy-std-msgs ros-jazzy-std-srvs \
             ros-jazzy-geometry-msgs ros-jazzy-rclpy ros-jazzy-ros-gz \
+            ros-jazzy-nav-msgs ros-jazzy-sensor-msgs ros-jazzy-tf2-ros \
             ros-jazzy-xacro ros-jazzy-robot-state-publisher \
             ros-jazzy-joint-state-publisher-gui ros-jazzy-rviz2 \
             ros-jazzy-ament-lint-auto ros-jazzy-ament-lint-common \
@@ -55,7 +56,10 @@ jobs:
             examples/phase1/main.cpp \
             examples/phase1/test_kinematics.cpp \
             ros2_ws/src/amr_learning/src/cpp_peer.cpp \
-            ros2_ws/src/amr_control/src/ackermann_controller.cpp
+            ros2_ws/src/amr_control/src/ackermann_controller.cpp \
+            ros2_ws/src/amr_control/src/ackermann_odometry.cpp \
+            ros2_ws/src/amr_control/include/amr_control/odometry.hpp \
+            ros2_ws/src/amr_control/test/test_odometry.cpp
 
       - name: Build and test kinematics
         run: |

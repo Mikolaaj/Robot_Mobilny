@@ -7,10 +7,12 @@ import tempfile
 import time
 
 from geometry_msgs.msg import Twist
+from nav_msgs.msg import Odometry
 import rclpy
 from rclpy.qos import qos_profile_sensor_data
 from rosgraph_msgs.msg import Clock
 from sensor_msgs.msg import JointState
+from tf2_msgs.msg import TFMessage
 
 
 def main():
@@ -37,6 +39,14 @@ def main():
                 node = rclpy.create_node('gazebo_integration_test')
                 state = {}
                 clocks = []
+                odoms = []
+                truth = []
+
+                def receive_truth(message):
+                    """Select the model pose, not individual link poses."""
+                    for tf in message.transforms:
+                        if tf.child_frame_id == 'amr_robot':
+                            truth.append(tf.transform.translation.x)
 
                 def receive(message):
                     """Keep actual joint positions and velocities by joint name."""
@@ -47,6 +57,8 @@ def main():
                 clock_sub = node.create_subscription(
                     Clock, '/clock', clocks.append, qos_profile_sensor_data
                 )
+                odom_sub = node.create_subscription(Odometry, '/odom', odoms.append, 10)
+                truth_sub = node.create_subscription(TFMessage, '/gazebo/poses', receive_truth, 10)
                 publisher = node.create_publisher(Twist, '/cmd_vel', 10)
 
                 def wait_for(predicate, timeout, label, command=None):
@@ -72,10 +84,14 @@ def main():
                 wait_for(
                     lambda: len(state) == 6
                     and len(clocks) > 1
+                    and len(odoms) > 0
+                    and len(truth) > 0
                     and publisher.get_subscription_count() > 0,
                     30,
                     'clock, six joints and controller discovery',
                 )
+                initial_truth = truth[-1]
+                initial_odom = odoms[-1].pose.pose.position.x
                 baseline = {name: state[name][0] for name in wheels}
                 drive = Twist()
                 drive.linear.x = 0.2
@@ -85,6 +101,15 @@ def main():
                     'four wheels rotating',
                     drive,
                 )
+                wait_for(
+                    lambda: odoms[-1].pose.pose.position.x - initial_odom > 0.2,
+                    10,
+                    'measured odometry progress',
+                    drive,
+                )
+                delta_odom = odoms[-1].pose.pose.position.x - initial_odom
+                delta_truth = truth[-1] - initial_truth
+                assert abs(delta_odom - delta_truth) < 0.08, (delta_odom, delta_truth)
                 turn = Twist()
                 turn.linear.x = 0.2
                 turn.angular.z = 0.1
@@ -130,7 +155,7 @@ def main():
                     'PASS: Gazebo clock, bridge, four drives, steering, timeout and crash shutdown'
                 )
                 # Keep subscriptions alive throughout the test.
-                del joint_sub, clock_sub
+                del joint_sub, clock_sub, odom_sub, truth_sub
     except Exception:
         if 'log' in locals() and not log.closed:
             log.seek(0)

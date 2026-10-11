@@ -46,12 +46,15 @@ Użytkownik potwierdził uruchomienie pustego świata w GUI Gazebo.
 Zależności developerskie Pythona zapisujemy w requirements-dev.txt.
 Po aktywacji środowiska instaluj je przez python -m pip install -r requirements-dev.txt.
 Docker jest opcjonalny; jego daemon nie był uruchomiony podczas diagnostyki.
-Pakiet edukacyjny ROS znajduje się w ros2_ws/src/amr_learning. Model robota i sterownik powstaną w kolejnych fazach.
+Pakiety ROS: amr_learning (nauka komunikacji), amr_description (model),
+amr_control (sterownik) i amr_simulation (Gazebo).
 
 ## Aktualny stan i konstrukcja
 
-Fazy 0–2 ukończone. Faza 3 w toku: workflow CI wysłany na GitHub;
-wynik Actions wymaga potwierdzenia. Docker i publikowanie obrazu CD pozostają do wykonania.
+Fazy 0–2 i 4 ukończone. CI z fazy 3 działa na GitHubie; Docker i CD
+pozostają do wykonania. Faza 5 w toku na gałęzi gazebo-simulation:
+jazda, skręt i zatrzymanie sprawdzone ręcznie; test integracyjny sterownika
+przeszedł lokalnie. Test Gazebo i rozszerzenie CI są gotowe; pozostają przegląd, wynik Actions i PR.
 Przykład kinematyki został dostosowany do Ackermanna 4WD.
 Komendy określają prędkość środka tylnej osi i prędkość obrotu robota.
 Robot nie obraca się w miejscu; każde koło dostaje własne RPM.
@@ -80,4 +83,18 @@ Kolejne fazy: osobna gałąź → lokalne testy → commit/push → pull request
 
 Model 4WD z przednimi kołami skrętnymi działa w RViz.
 [Budowanie, uruchamianie, ustawienia RViz i diagnostyka](docs/phase4.md).
-Zapis konfiguracji widoku oraz rozszerzenie CI pozostają do dokończenia.
+Konfiguracja RViz jest zapisana w pakiecie; model jest sprawdzany w CI.
+
+## Faza 5 — Gazebo i sterowanie 4WD
+
+Jedna komenda uruchamia świat, robota, most i sterownik:
+
+```bash
+cd ~/Desktop/Robot_Mobilny
+source tools/activate.bash
+source ros2_ws/install/setup.bash
+ros2 launch amr_simulation simulation.launch.py
+```
+
+Budowanie, drugi terminal z komendami, testy oraz ograniczenia:
+[instrukcja fazy 5](docs/phase5.md).

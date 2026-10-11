@@ -1,0 +1,52 @@
+# Czas symulacji: Gazebo -> ROS 2
+- ros_topic_name: /clock
+  gz_topic_name: /world/warehouse/clock
+  ros_type_name: rosgraph_msgs/msg/Clock
+  gz_type_name: gz.msgs.Clock
+  direction: GZ_TO_ROS
+  qos_profile: CLOCK
+
+# Rzeczywisty stan przegubów: Gazebo -> ROS 2
+- ros_topic_name: /joint_states
+  gz_topic_name: /model/amr_robot/joint_state
+  ros_type_name: sensor_msgs/msg/JointState
+  gz_type_name: gz.msgs.Model
+  direction: GZ_TO_ROS
+
+# Prędkości czterech kół w rad/s: ROS 2 -> Gazebo
+- ros_topic_name: /amr/commands/rear_left_velocity
+  gz_topic_name: /model/amr_robot/joint/rear_left_wheel_joint/cmd_vel
+  ros_type_name: std_msgs/msg/Float64
+  gz_type_name: gz.msgs.Double
+  direction: ROS_TO_GZ
+
+- ros_topic_name: /amr/commands/rear_right_velocity
+  gz_topic_name: /model/amr_robot/joint/rear_right_wheel_joint/cmd_vel
+  ros_type_name: std_msgs/msg/Float64
+  gz_type_name: gz.msgs.Double
+  direction: ROS_TO_GZ
+
+- ros_topic_name: /amr/commands/front_left_velocity
+  gz_topic_name: /model/amr_robot/joint/front_left_wheel_joint/cmd_vel
+  ros_type_name: std_msgs/msg/Float64
+  gz_type_name: gz.msgs.Double
+  direction: ROS_TO_GZ
+
+- ros_topic_name: /amr/commands/front_right_velocity
+  gz_topic_name: /model/amr_robot/joint/front_right_wheel_joint/cmd_vel
+  ros_type_name: std_msgs/msg/Float64
+  gz_type_name: gz.msgs.Double
+  direction: ROS_TO_GZ
+
+# Kąty skrętu przednich kół w radianach: ROS 2 -> Gazebo
+- ros_topic_name: /amr/commands/front_left_steering
+  gz_topic_name: /model/amr_robot/joint/front_left_steering_joint/cmd_pos
+  ros_type_name: std_msgs/msg/Float64
+  gz_type_name: gz.msgs.Double
+  direction: ROS_TO_GZ
+
+- ros_topic_name: /amr/commands/front_right_steering
+  gz_topic_name: /model/amr_robot/joint/front_right_steering_joint/cmd_pos
+  ros_type_name: std_msgs/msg/Float64
+  gz_type_name: gz.msgs.Double
+  direction: ROS_TO_GZ

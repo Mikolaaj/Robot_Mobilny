@@ -5,8 +5,8 @@
 Cztery koła napędowe (4WD), przednie lewe i prawe skrętne: Ackermann.
 Nie stosujemy koła podporowego ani sterowania skid-steer.
 Każde koło otrzymuje własną komendę prędkości obrotowej.
-Docelowo: cztery przeguby napędowe i dwa przeguby skrętu przednich kół.
-base_link planujemy w środku tylnej osi; tam definiujemy linear.x i angular.z.
+Model ma cztery przeguby napędowe i dwa przeguby skrętu przednich kół.
+base_link znajduje się w środku tylnej osi; tam definiujemy linear.x i angular.z.
 Koła: front_left_wheel_link, front_right_wheel_link,
 rear_left_wheel_link, rear_right_wheel_link. Dodatkowe steering links ustalimy
 w fazie URDF. Pozostałe ramy: map, odom, laser_link, camera_link, imu_link.
@@ -21,16 +21,19 @@ Robot nie wykonuje obrotów w miejscu; teleoperacja i Nav2 muszą to respektowa�
 1. Gotowe: samodzielne obliczenia Ackermanna C++/Python i testy jednostkowe.
 2. Gotowe: edukacyjny amr_learning — tematy, parametr, usługa, akcja,
    test integracyjny. Nie jest jeszcze sterownikiem robota.
-3. W toku: workflow GitHub Actions i lokalne sprawdzenia gotowe; wynik CI
-   na GitHubie wymaga potwierdzenia. Docker/CD pozostają do zrobienia.
+3. CI gotowe i potwierdzone na GitHubie dla wcześniejszych faz;
+   rozszerzenie fazy 5 oczekuje wysłania i wyniku Actions. Docker/CD pozostają do zrobienia.
    Szczegóły: [phase3.md](phase3.md); zasady gałęzi: [development.md](development.md).
 
 ## Dalsze fazy i technologie
 
-4. W toku: URDF/Xacro, RViz i TF modelu działają; cztery koła i dwa przednie
-   przeguby skrętu. Pozostają zapis widoku, testy i rozszerzenie CI.
+4. Gotowe: URDF/Xacro, RViz, zapis widoku, TF modelu i CI; cztery koła
+   i dwa przednie przeguby skrętu.
    Instrukcja: [phase4.md](phase4.md).
-5. Gazebo magazyn, ros_gz/ROS ↔ Gazebo Transport, teleoperacja Ackermanna.
+5. Lokalnie gotowe: Gazebo, dwa regały, ros_gz/ROS ↔ Gazebo Transport,
+   sterowanie /cmd_vel Ackermanna, timeout i zamykanie po awarii sterownika.
+   Testy sterownika i Gazebo; rozszerzone CI. Pozostają wynik Actions i PR.
+   Instrukcja: [phase5.md](phase5.md).
    Sterownik musi obsługiwać cztery RPM i dwa kąty; nie zakładamy, że gotowy
    ackermann_steering_controller obsłuży napęd 4WD bez rozszerzenia.
 6. Odometria Ackermanna i TF odom → base_link, pomiary kół i skrętu.

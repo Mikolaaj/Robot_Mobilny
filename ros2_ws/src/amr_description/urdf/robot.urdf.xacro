@@ -1,19 +1,23 @@
 <?xml version="1.0"?>
 <robot name="amr_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <!-- 1. Wymiary podwozia -->
+  <!-- Parametry podwozia: metry i kilogramy -->
   <xacro:property name="chassis_length" value="0.80"/>
   <xacro:property name="chassis_width" value="0.30"/>
   <xacro:property name="chassis_height" value="0.12"/>
+  <xacro:property name="chassis_mass" value="12.0"/>
 
-  <!-- 2. Wymiary kół -->
+  <!-- Parametry kół i skrętu -->
   <xacro:property name="wheel_radius" value="0.10"/>
   <xacro:property name="wheel_width" value="0.05"/>
   <xacro:property name="wheel_track" value="0.40"/>
   <xacro:property name="wheelbase" value="0.60"/>
   <xacro:property name="steering_limit" value="0.60"/>
+  <xacro:property name="wheel_mass" value="0.50"/>
+  <xacro:property name="steering_mass" value="0.20"/>
+  <xacro:property name="steering_size" value="0.04"/>
 
-  <!-- 3. Kolory -->
+  <!-- Kolory -->
   <material name="chassis_blue">
     <color rgba="0.1 0.3 0.8 1.0"/>
   </material>
@@ -22,11 +26,23 @@
     <color rgba="0.08 0.08 0.08 1.0"/>
   </material>
 
-  <!-- 4. Układ odniesienia w środku tylnej osi -->
+  <!-- Układ odniesienia w środku tylnej osi -->
   <link name="base_link"/>
 
-  <!-- 5. Podwozie -->
+  <!-- Podwozie -->
   <link name="chassis_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${chassis_mass}"/>
+      <inertia
+        ixx="${chassis_mass * (chassis_width**2 + chassis_height**2) / 12}"
+        ixy="0"
+        ixz="0"
+        iyy="${chassis_mass * (chassis_length**2 + chassis_height**2) / 12}"
+        iyz="0"
+        izz="${chassis_mass * (chassis_length**2 + chassis_width**2) / 12}"/>
+    </inertial>
+
     <visual>
       <geometry>
         <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
@@ -41,17 +57,33 @@
     </collision>
   </link>
 
-  <!-- 6. Sztywne połączenie podwozia z base_link -->
   <joint name="base_to_chassis" type="fixed">
     <parent link="base_link"/>
     <child link="chassis_link"/>
     <origin xyz="0.30 0 0.12" rpy="0 0 0"/>
   </joint>
 
-  <!-- 7. Definicja tylnego koła i jego przegubu -->
+  <!-- Wspólna bezwładność koła: cylinder z osią Y -->
+  <xacro:macro name="wheel_inertial">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${wheel_mass}"/>
+      <inertia
+        ixx="${wheel_mass * (3 * wheel_radius**2 + wheel_width**2) / 12}"
+        ixy="0"
+        ixz="0"
+        iyy="${wheel_mass * wheel_radius**2 / 2}"
+        iyz="0"
+        izz="${wheel_mass * (3 * wheel_radius**2 + wheel_width**2) / 12}"/>
+    </inertial>
+  </xacro:macro>
+
+  <!-- Tylne koło: obrót bez skrętu -->
   <xacro:macro name="rear_wheel" params="side y">
 
     <link name="rear_${side}_wheel_link">
+      <xacro:wheel_inertial/>
+
       <visual>
         <origin xyz="0 0 0" rpy="${pi / 2} 0 0"/>
         <geometry>
@@ -77,14 +109,23 @@
 
   </xacro:macro>
 
-  <!-- 8. Utworzenie lewego i prawego tylnego koła -->
-  <xacro:rear_wheel side="left" y="${wheel_track / 2}"/>
-  <xacro:rear_wheel side="right" y="${-wheel_track / 2}"/>
-
   <!-- Przednie koło: skręt zwrotnicy i obrót koła -->
   <xacro:macro name="front_wheel" params="side y">
 
-    <link name="front_${side}_steering_link"/>
+    <link name="front_${side}_steering_link">
+      <!-- Przybliżenie bezwładności zwrotnicy jako sześcianu -->
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="${steering_mass}"/>
+        <inertia
+          ixx="${steering_mass * steering_size**2 / 6}"
+          ixy="0"
+          ixz="0"
+          iyy="${steering_mass * steering_size**2 / 6}"
+          iyz="0"
+          izz="${steering_mass * steering_size**2 / 6}"/>
+      </inertial>
+    </link>
 
     <joint name="front_${side}_steering_joint" type="revolute">
       <parent link="base_link"/>
@@ -98,6 +139,8 @@
     </joint>
 
     <link name="front_${side}_wheel_link">
+      <xacro:wheel_inertial/>
+
       <visual>
         <origin xyz="0 0 0" rpy="${pi / 2} 0 0"/>
         <geometry>
@@ -123,7 +166,63 @@
 
   </xacro:macro>
 
+  <!-- Utworzenie czterech kół -->
+  <xacro:rear_wheel side="left" y="${wheel_track / 2}"/>
+  <xacro:rear_wheel side="right" y="${-wheel_track / 2}"/>
   <xacro:front_wheel side="left" y="${wheel_track / 2}"/>
   <xacro:front_wheel side="right" y="${-wheel_track / 2}"/>
+
+  <!-- Odczyt rzeczywistych pozycji przegubów z Gazebo -->
+  <gazebo>
+    <plugin filename="gz-sim-joint-state-publisher-system"
+            name="gz::sim::systems::JointStatePublisher">
+      <topic>/model/amr_robot/joint_state</topic>
+
+      <joint_name>rear_left_wheel_joint</joint_name>
+      <joint_name>rear_right_wheel_joint</joint_name>
+      <joint_name>front_left_steering_joint</joint_name>
+      <joint_name>front_right_steering_joint</joint_name>
+      <joint_name>front_left_wheel_joint</joint_name>
+      <joint_name>front_right_wheel_joint</joint_name>
+    </plugin>
+  </gazebo>
+
+  <!-- Kontroler prędkości pojedynczego koła: rad/s -->
+  <xacro:macro name="wheel_drive" params="joint">
+    <gazebo>
+      <plugin filename="gz-sim-joint-controller-system"
+              name="gz::sim::systems::JointController">
+        <joint_name>${joint}</joint_name>
+        <topic>/model/amr_robot/joint/${joint}/cmd_vel</topic>
+        <initial_velocity>0.0</initial_velocity>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+
+  <!-- Cztery koła napędowe -->
+  <xacro:wheel_drive joint="rear_left_wheel_joint"/>
+  <xacro:wheel_drive joint="rear_right_wheel_joint"/>
+  <xacro:wheel_drive joint="front_left_wheel_joint"/>
+  <xacro:wheel_drive joint="front_right_wheel_joint"/>
+
+  <!-- Kontroler kąta skrętu: radiany -->
+  <xacro:macro name="steering_control" params="joint">
+    <gazebo>
+      <plugin filename="gz-sim-joint-position-controller-system"
+              name="gz::sim::systems::JointPositionController">
+        <joint_name>${joint}</joint_name>
+        <topic>/model/amr_robot/joint/${joint}/cmd_pos</topic>
+        <initial_position>0.0</initial_position>
+
+        <!-- Sterowanie pozycją przez prędkość, maksymalnie 1 rad/s -->
+        <use_velocity_commands>true</use_velocity_commands>
+        <cmd_max>1.0</cmd_max>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+
+  <!-- Skręt tylko przednich kół -->
+  <xacro:steering_control joint="front_left_steering_joint"/>
+  <xacro:steering_control joint="front_right_steering_joint"/>
 
 </robot>

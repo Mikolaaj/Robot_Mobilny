@@ -36,7 +36,9 @@ Robot nie wykonuje obrotów w miejscu; teleoperacja i Nav2 muszą to respektowa�
    Instrukcja: [phase5.md](phase5.md).
    Sterownik musi obsługiwać cztery RPM i dwa kąty; nie zakładamy, że gotowy
    ackermann_steering_controller obsłuży napęd 4WD bez rozszerzenia.
-6. Odometria Ackermanna i TF odom → base_link, pomiary kół i skrętu.
+6. Implementacja lokalna: odometria Ackermanna z pomiarów, /odom, TF
+   odom → base_link, widok RViz i testy. Wynik CI/PR po wysłaniu zmian.
+   Instrukcja: [phase6.md](phase6.md).
 7. LiDAR, IMU, kamera, sensor_msgs, fuzja odometrii/IMU.
 8. slam_toolbox, mapowanie i zapis mapy; TF map → odom.
 9. Nav2/AMCL/costmaps/BT: planowanie z ograniczeniem promienia skrętu,

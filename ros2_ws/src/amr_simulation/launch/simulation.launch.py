@@ -8,6 +8,7 @@ from launch.actions import (
     IncludeLaunchDescription,
     RegisterEventHandler,
 )
+from launch.conditions import IfCondition
 from launch.event_handlers import OnProcessExit
 from launch.events import Shutdown
 from launch.launch_description_sources import PythonLaunchDescriptionSource
@@ -79,6 +80,22 @@ def generate_launch_description():
         output='screen',
     )
 
+    odometry = Node(
+        package='amr_control',
+        executable='ackermann_odometry',
+        parameters=[{'use_sim_time': True}],
+        output='screen',
+    )
+
+    rviz = Node(
+        package='rviz2',
+        executable='rviz2',
+        arguments=['-d', str(simulation_dir / 'config' / 'odometry.rviz')],
+        parameters=[{'use_sim_time': True}],
+        condition=IfCondition(LaunchConfiguration('rviz')),
+        output='screen',
+    )
+
     stop_on_controller_exit = RegisterEventHandler(
         OnProcessExit(
             target_action=controller,
@@ -89,11 +106,14 @@ def generate_launch_description():
     return LaunchDescription(
         [
             DeclareLaunchArgument('gz_args', default_value='-r'),
+            DeclareLaunchArgument('rviz', default_value='false'),
             stop_on_controller_exit,
             gazebo,
             state_publisher,
             spawn_robot,
             bridge,
             controller,
+            odometry,
+            rviz,
         ]
     )

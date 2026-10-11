@@ -98,3 +98,17 @@ ros2 launch amr_simulation simulation.launch.py
 
 Budowanie, drugi terminal z komendami, testy oraz ograniczenia:
 [instrukcja fazy 5](docs/phase5.md).
+
+## Faza 6 — odometria i TF
+
+Implementacja i testy lokalne gotowe na branchu ackermann-odometry.
+Zmiany wymagają commita, wyniku GitHub Actions i scalenia PR.
+
+Węzeł C++ oblicza ruch z pomiarów kół i skrętu, publikuje /odom oraz
+odom -> base_link. Uruchomienie z widokiem odometrii:
+
+```bash
+ros2 launch amr_simulation simulation.launch.py rviz:=true
+```
+
+[Budowanie, sterowanie, pomiary, testy i ograniczenia](docs/phase6.md).
